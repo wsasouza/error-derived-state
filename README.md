@@ -41,6 +41,65 @@ Um dos erros mais comuns no React (e você provavelmente já cometeu também) é
 
 Esses estados acabam causando renderizações desnecessárias, que podem ser substituídos facilmente por variáveis calculadas em tempo de execução.
 
+```typescript
+/* . . . */
+
+export function App() {
+  const [repos, setRepos] = useState<Repo[]>([]);
+  const [filteredRepos, setFilteredRepos] = useState<Repo[]>([]); // one state ( + )
+  const [search, setSearch] = useState('');
+
+  console.log('Render');
+
+  useEffect(() => {
+    fetch('https://api.github.com/users/wsasouza/repos')
+      .then((response) => response.json())
+      .then((data) => setRepos(data));
+  }, []);
+
+  useEffect(() => { // one useEffect ( + )
+    if (search.length > 0)
+      setFilteredRepos(repos.filter((repo) => repo.name.includes(search)));
+  }, [search]);
+
+  return (
+    <div>
+      <input
+ /* . . . */
+```
+
+👆 Código não otimizado gerando renderizações desnecessárias.<br><br>
+
+```typescript
+/* . . . */
+
+export function App() {
+  const [repos, setRepos] = useState<Repo[]>([]);
+  // removing unnecessary state ( - )
+  const [search, setSearch] = useState('');
+
+  console.log('Render');
+
+  useEffect(() => {
+    fetch('https://api.github.com/users/wsasouza/repos')
+      .then((response) => response.json())
+      .then((data) => setRepos(data));
+  }, []);
+
+  // Removing unnecessary useEffect ( - )
+
+  const filteredRepos = search.length > 0 // ( + )
+	? repos.filter(repo => repo.name.includes(search))
+	: [];
+
+  return (
+    <div>
+      <input
+ /* . . . */
+```
+
+👆 O React só precisou renderizar esse componente novamente quando setSearch foi chamado dentro do input. O valor dos repositórios filtrados não precisam ficar dentro de um novo estado, pois eles podem ser calculados dentro de um componente como uma variável.
+
 ## :rocket: Technologies
 
 The following tools were used in this project:
