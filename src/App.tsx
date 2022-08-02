@@ -7,8 +7,8 @@ interface Repo {
 
 
 export function App() {
-  const [repos, setRepos] = useState<Repo[]>([]);
-  // const [filteredRepos, setFilteredRepos] = useState<Repo[]>([]);
+  const [repos, setRepos] = useState<Repo[]>([]); 
+  const [filteredRepos, setFilteredRepos] = useState<Repo[]>([]);
   const [search, setSearch] = useState('');  
 
   console.log('Render');
@@ -19,14 +19,10 @@ export function App() {
       .then(data => setRepos(data))
   }, []);
 
-  const filteredRepos = search.length > 0
-    ? repos.filter(repo => repo.name.includes(search))
-    : [];
-
-  // useEffect(() => {
-  //   if (search.length > 0)
-  //     setFilteredRepos(repos.filter(repo => repo.name.includes(search)));
-  // }, [search]);
+  useEffect(() => {
+    if (search.length > 0)
+      setFilteredRepos(repos.filter(repo => repo.name.includes(search)));
+  }, [search]);  
 
   return (
     <div>
